@@ -1,15 +1,16 @@
-const express = require('express');
-const Customer = require('./models/Customer');
-const { getCustomer } = require('./middlewares/getCustomer');
-const Transaction = require('./models/Transaction');
-const mongoose = require('mongoose');
+const express = require("express");
+const routes = require("./routes/appRoutes");
+
+const Transaction = require("./models/Transaction");
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded());
+app.use(routes);
 
-app.get('/portfolios/:id', getCustomer, async (req, res) => {
-  const { id } = req.params
-  const portfolio = await Customer.findOne({ '_id': id })
-  res.json(portfolio)
-})
+app.post("/transactions/deposit", async (req, res) => {
+  const deposit = req.body;
+  await Transaction.create(deposit);
+  res.sendStatus(201);
+});
 
-module.exports = app
+module.exports = app;

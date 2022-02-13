@@ -1,13 +1,12 @@
-
-version: '3'
+version: "3"
 
 services:
   server:
     container_name: NODEJS_SERVER
-    build: '.'
+    build: "."
     volumes:
       - ./:/node-app
-      - ./node_modules:/node-app/node_modules
+      - /node-app/node_modules
     environment:
       NODE_ENV: development
     depends_on:
@@ -15,12 +14,12 @@ services:
     links:
       - db
     ports:
-      - '9000:9000'
+      - "9000:9000"
 
   db:
-    image: 'mongo'
+    image: "mongo"
     container_name: MONGODB
     ports:
-      - '27017:27017'
+      - "27017:27017"
     volumes:
       - ./data/db:/data/db

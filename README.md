@@ -1,5 +1,71 @@
 # Warren Backend Task
 
+## Comentários do Desenvolvedor
+
+- Gerando a imagem
+  - Na minha máquina o comando `docker-compose up` estava gerando um erro nos pacotes npm. Para corrigir foi necessário alterar a o volume referente aos node_modules:
+
+```
+ volumes:
+    - ./:/node-app
+    - /node-app/node_modules
+```
+
+### Estrutura de projeto adotada
+
+Este projeto foi arquitetado pensando na separação de responsabilidades baseando-se no princípio da responsabilidade única do SOLID.
+
+Foram utilizandas camadas de rotas (routes), requisições (controllers), serviços (services) e chamadas ao banco de dados (repositories).
+
+Além destas camadas o projeto possui 2 middlewares que "simulam" a autenticação do usuário (getCustomer) e o processamento das transações financeiras (processTransaction).
+
+A sequência de comunicação entre as camadas segue o seguinte fluxo:
+
+#### client <--> controllers <--> services <--> repositories
+
+Já os middlewares podem se comunicar diretamente com o cliente e os repositories.
+
+### Estrutura de pastas e arquivos
+
+```
+warren-api-task
+├── docker-compose.yml
+├── Dockerfile
+├── migrate-mongo-config.js
+├── migrations
+├── node_modules
+├── package.json
+├── package-lock.json
+├── README.md
+└── src
+    ├── index.js
+    ├── app.js
+    ├── controllers
+    │   ├── adminController.js
+    │   ├── portfolioController.js
+    │   └── transactionController.js
+    ├── middlewares
+    │   ├── getCustomer.js
+    │   └── processTransaction.js
+    ├── models
+    │   ├── Customer.js
+    │   ├── Portfolio.js
+    │   └── Transaction.js
+    ├── repositories
+    │   ├── customerRepository.js
+    │   ├── portfolioRepository.js
+    │   └── transactionRepository.js
+    ├── routes
+    │   └── appRoutes.js
+    └── services
+        ├── portfolioService.js
+        ├── transactionService.js
+        ├── updateCustomerBalance.js
+        └── updatePortfolioBalance.js
+```
+
+## Desafio
+
 Bem vindo!
 
 Esse exercicio de backend envolve construir uma REST API simples em Node.js/Express.js.
@@ -9,18 +75,21 @@ Esse exercicio de backend envolve construir uma REST API simples em Node.js/Expr
 ### Customer
 
 Estrutura de usuario padrão da plataforma. Alguns pontos de atenção:
+
 - `balance`: saldo da conta do usuario. Por este atributo que ocorrem as transações financeiras. Saldo da conta nunca pode ser negativo.
 - `portfolios`: lista de subdocumentos de `Portfolio`
 
 ### Portfolio
 
 Portfólio de investimentos é o conjunto de aplicações do investidor, também chamado de carteira de investimentos. Neste exercicio foi simplificada para uma estrutura mais basica:
+
 - `amount`: quantidade atualmente alocada no portfolio
 - `amountGoal`: quantidade total do objetivo alvo do portfolio
 
 ### Transaction
 
 `Transaction` é o mapeamento de uma transação financeira da plataforma:
+
 - `type`: tipo da transação:
   - `deposit`: deposito externo para saldo da conta do `customer`
   - `withdraw`: resgate do saldo do usuario para fora da plataforma
@@ -49,23 +118,23 @@ Para rodar a aplicação, inicializar e popular o banco de dados basta rodar `do
 
 Para especificar qual customer da request é repassado o seu id via header: `customer-id = <string>`
 
-1. ***GET*** `/portfolios/:id` - Essa rota esta quebrada! Dado um id de um portfolio essa rota deve retornar os dados do portfolio.
+1. **_GET_** `/portfolios/:id` - Essa rota esta quebrada! Dado um id de um portfolio essa rota deve retornar os dados do portfolio.
 
-1. ***GET*** `/portfolios/goalReached` - Retorna uma lista de todos portfolios de um determinado customer em que a quantidade alocada no portfolio é igual ou maior que o objetivo alvo do portfolio.
+1. **_GET_** `/portfolios/goalReached` - Retorna uma lista de todos portfolios de um determinado customer em que a quantidade alocada no portfolio é igual ou maior que o objetivo alvo do portfolio.
 
-1. ***GET*** `/transactions/deposits?status=<string>&start=<date>&end=<date>` - Retorna uma lista de transações `deposit` do customer abertas de um determinado `status` entre um determinado período de tempo delimitado por `start` e `end`
+1. **_GET_** `/transactions/deposits?status=<string>&start=<date>&end=<date>` - Retorna uma lista de transações `deposit` do customer abertas de um determinado `status` entre um determinado período de tempo delimitado por `start` e `end`
 
-1. ***POST*** `/transactions/deposit` - Depositar um valor `amount` na conta do usuario que fez a requisição.
+1. **_POST_** `/transactions/deposit` - Depositar um valor `amount` na conta do usuario que fez a requisição.
 
-1. ***POST*** `/transactions/account-transfer/:customerId` - Transferência entre customer que fez a chamada em direção a conta de outro customer `<customerId>`
+1. **_POST_** `/transactions/account-transfer/:customerId` - Transferência entre customer que fez a chamada em direção a conta de outro customer `<customerId>`
 
-1. ***POST*** `/transactions/portfolio-transfer?fromPortfolio=<string>toPortfolio=<string>` - Transferência entre dois portfolios de um customer.
+1. **_POST_** `/transactions/portfolio-transfer?fromPortfolio=<string>toPortfolio=<string>` - Transferência entre dois portfolios de um customer.
 
-1. ***GET*** `/admin/topAllocationAmount?page=<integer>&pageSize=<integer>` - Retorna lista de clientes com maior valor alocado juntando todos seus portfolios. Contém paginação[^1].
+1. **_GET_** `/admin/topAllocationAmount?page=<integer>&pageSize=<integer>` - Retorna lista de clientes com maior valor alocado juntando todos seus portfolios. Contém paginação[^1].
 
-1. ***GET*** `/admin/topCashChurn?page=<integer>&pageSize=<integer>&start=<date>&end=<date>` - Retorna os clientes que mais retiraram dinheiro da plataforma entre um determinado periodo de tempo delimitado por `start` e `end`. Contém paginação[^1].
+1. **_GET_** `/admin/topCashChurn?page=<integer>&pageSize=<integer>&start=<date>&end=<date>` - Retorna os clientes que mais retiraram dinheiro da plataforma entre um determinado periodo de tempo delimitado por `start` e `end`. Contém paginação[^1].
 
-[^1]: `pageSize` (*limit*) é o número de itens a serem retornados, `page` (*offset*) é o número da página a ser mostrada a partir do `pageSize` descrito. Exemplo: `pageSize=10` e `page=0` retorna somente os 10 primeiros itens listados, `pageSize=10` e `page=1` retorna dos 11 aos 20 itens listados.
+[^1]: `pageSize` (_limit_) é o número de itens a serem retornados, `page` (_offset_) é o número da página a ser mostrada a partir do `pageSize` descrito. Exemplo: `pageSize=10` e `page=0` retorna somente os 10 primeiros itens listados, `pageSize=10` e `page=1` retorna dos 11 aos 20 itens listados.
 
 ## Pontos de atenção
 
@@ -75,5 +144,5 @@ Para especificar qual customer da request é repassado o seu id via header: `cus
 
 ## Indo além dos requisitos
 
-Aqui na Warren prezamos pelo nosso lema *Get Shit Done*, ou seja, concluir o esperado e da melhor maneira possível.
+Aqui na Warren prezamos pelo nosso lema _Get Shit Done_, ou seja, concluir o esperado e da melhor maneira possível.
 Se você ficou com tempo sobrando seria interessante demonstrar seus conhecimentos como um diferencial. Por exemplo, testes unitários ou uma diferente estrutura de projeto.
