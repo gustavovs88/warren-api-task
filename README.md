@@ -3,13 +3,30 @@
 ## Comentários do Desenvolvedor
 
 - Gerando a imagem
-  - Na minha máquina o comando `docker-compose up` estava gerando um erro nos pacotes npm. Para corrigir foi necessário alterar a o volume referente aos node_modules:
 
-```
- volumes:
+  - Na minha máquina o comando `docker-compose up` estava gerando um erro nos pacotes npm. Para corrigir foi necessário alterar a o volume referente aos node_modules no arquivo docker-compose.yml:
+
+  ```
+  volumes:
     - ./:/node-app
     - /node-app/node_modules
-```
+  ```
+
+  - Para a criação dos testes foram incluidos os pacotes `jest` e `mongodb-memory-server` como dependências de desenvolvimento. O pacote `mongodb-memory-server` possibilita a criação de um banco de dados de teste na memória o que torna os testes mais rápidos.
+  - A imagem original node:14-alpine não suporta o pacote `mongodb-memory-server`, neste caso o arquivo Dockerfile e docker-compose.yml foram alterados para possibilitar a utilização do pacote e rodar os testes ao subir o container.
+
+  _Obs.: Ao rodar o primeiro teste será realizado o download dos binários do mongodb, esse processo pode demorar mais do que o tempo permitido para execução do teste. Neste caso utilize ` jest.setTimeout(<tempo de downloand em ms>);` no arquivo do primeiro teste. Após o primeiro teste estes dados são armazenados em cache_
+
+### Premissas
+
+- id do cliente é sempre enviado por meio de um header `customer-id`;
+- Os dados não enviados pelas querys definidas no escopo do projeto são enviados pelo _body_ do _request_ no formato _JSON_
+
+### Testes
+
+A configuração básica para a escrita dos testes foi concluída , porém não houve tempo hábil realizar todos os testes necessários.
+
+Considerando a arquitetura do projeto entendo que a camada de services deveria ser priorizada para a realização dos testes.
 
 ### Estrutura de projeto adotada
 
@@ -28,6 +45,7 @@ Já os middlewares podem se comunicar diretamente com o cliente e os repositorie
 ### Estrutura de pastas e arquivos
 
 ```
+
 warren-api-task
 ├── docker-compose.yml
 ├── Dockerfile
@@ -37,34 +55,41 @@ warren-api-task
 ├── package.json
 ├── package-lock.json
 ├── README.md
-└── src
-    ├── index.js
-    ├── app.js
-    ├── controllers
-    │   ├── adminController.js
-    │   ├── portfolioController.js
-    │   └── transactionController.js
-    ├── middlewares
-    │   ├── getCustomer.js
-    │   └── processTransaction.js
-    ├── models
-    │   ├── Customer.js
-    │   ├── Portfolio.js
-    │   └── Transaction.js
-    ├── repositories
-    │   ├── customerRepository.js
-    │   ├── portfolioRepository.js
-    │   └── transactionRepository.js
-    ├── routes
-    │   └── appRoutes.js
-    └── services
-        ├── portfolioService.js
-        ├── transactionService.js
-        ├── updateCustomerBalance.js
-        └── updatePortfolioBalance.js
+├── src
+│ ├── app.js
+│ ├── controllers
+│ │ ├── adminController.js
+│ │ ├── portfolioController.js
+│ │ └── transactionController.js
+│ ├── index.js
+│ ├── middlewares
+│ │ ├── getCustomer.js
+│ │ └── processTransaction.js
+│ ├── models
+│ │ ├── Customer.js
+│ │ ├── Portfolio.js
+│ │ └── Transaction.js
+│ ├── repositories
+│ │ ├── customerRepository.js
+│ │ ├── portfolioRepository.js
+│ │ ├── transactionRepository.js
+│ │ └── transactionRepository.test.js
+│ ├── routes
+│ │ └── appRoutes.js
+│ └── services
+│ ├── portfolioService.js
+│ ├── portfolioService.test.js
+│ ├── transactionService.js
+│ ├── updateCustomerBalance.js
+│ └── updatePortfolioBalance.js
+└── \_tests
+├── customerMocks.js
+├── db.js
+└── transactionMocks.js
+
 ```
 
-## Desafio
+## Desafio Warren
 
 Bem vindo!
 
@@ -146,3 +171,7 @@ Para especificar qual customer da request é repassado o seu id via header: `cus
 
 Aqui na Warren prezamos pelo nosso lema _Get Shit Done_, ou seja, concluir o esperado e da melhor maneira possível.
 Se você ficou com tempo sobrando seria interessante demonstrar seus conhecimentos como um diferencial. Por exemplo, testes unitários ou uma diferente estrutura de projeto.
+
+```
+
+```

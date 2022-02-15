@@ -29,8 +29,8 @@ class TransactionRepository {
   }
   async insertTransaction(transaction) {
     try {
-      const deposit = await Transaction.create(transaction);
-      return deposit;
+      const createdTransaction = await Transaction.create(transaction);
+      return createdTransaction;
     } catch (error) {
       console.log("Error on creating a transaction document", error);
       return null;

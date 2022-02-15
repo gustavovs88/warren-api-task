@@ -1,4 +1,4 @@
-FROM node:14-alpine
+FROM node:16
 
 WORKDIR /node-app
 
@@ -16,6 +16,7 @@ RUN npm install migrate-mongo -g --quiet
 
 COPY . . 
 
+USER node
+
 EXPOSE 9000
 
-CMD npm run dev

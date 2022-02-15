@@ -84,7 +84,7 @@ class TransactionService {
       startDatetoISO,
       endDatetoISO
     );
-
+    console.log(gettopCashChurn);
     const topCashChurn = gettopCashChurn[0].data;
 
     return topCashChurn;

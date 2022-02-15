@@ -15,7 +15,7 @@ services:
       - db
     ports:
       - "9000:9000"
-
+    command: sh -c "npm run test && npm run dev"
   db:
     image: "mongo"
     container_name: MONGODB
