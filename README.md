@@ -56,12 +56,12 @@ warren-api-task
 ├── package-lock.json
 ├── README.md
 ├── src
+│ ├── index.js
 │ ├── app.js
 │ ├── controllers
 │ │ ├── adminController.js
 │ │ ├── portfolioController.js
 │ │ └── transactionController.js
-│ ├── index.js
 │ ├── middlewares
 │ │ ├── getCustomer.js
 │ │ └── processTransaction.js
@@ -82,10 +82,10 @@ warren-api-task
 │ ├── transactionService.js
 │ ├── updateCustomerBalance.js
 │ └── updatePortfolioBalance.js
-└── \_tests
-├── customerMocks.js
-├── db.js
-└── transactionMocks.js
+└── _tests
+  ├── customerMocks.js
+  ├── db.js
+  └── transactionMocks.js
 
 ```
 
